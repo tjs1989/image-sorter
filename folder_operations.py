@@ -12,5 +12,5 @@ class FolderOperations:
         os.mkdir(new_folder_path)
         logging.info(f"Created the folder {new_folder_path}")
 
-    def folder_in_image_path_exists(self, folder_name):
+    def does_folder_exist_in_image_path(self, folder_name):
         return path.exists(f"{self.image_folder_path}/{folder_name}")

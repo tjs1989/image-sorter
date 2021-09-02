@@ -19,13 +19,14 @@ logging.basicConfig(
 
 
 def create_folder_if_it_does_not_exist(folder_name):
-    if not folder_operations.folder_in_image_path_exists(folder_name):
+    if not folder_operations.does_folder_exist_in_image_path(folder_name):
         folder_operations.create_folder(folder_name=folder_name)
 
 
 if __name__ == '__main__':
 
-    # /Users/tonyskinner/Documents/phoneImages/IMG_20190201_070709.jpg
+    create_time = os.stat("/Users/tonyskinner/Documents/phoneImages/IMG_20190201_070709.jpg").st_mtime
+    modified_datetime = datetime.fromtimestamp(create_time)
 
     image_folder_path = "/Users/tonyskinner/Documents/phoneImages"
 
@@ -39,4 +40,6 @@ if __name__ == '__main__':
     image_list = get_list_of_images_in_path(image_folder_path)
 
     for image in image_list:
-        create_folder_if_it_does_not_exist(folder_name=image_operations.get_image_last_modified_year(image))
+        image_details = image_operations.get_image_last_modified_details(image)
+
+        create_folder_if_it_does_not_exist(folder_name=image_details['modified_year'])
