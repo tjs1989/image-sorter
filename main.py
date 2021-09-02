@@ -1,24 +1,27 @@
+import glob
 import os
 import time
 from datetime import datetime
 
-
-def print_hi(name):
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
+import image_operations
+import image_operations
 
 if __name__ == '__main__':
-    print_hi('PyCharm')
 
-    print("Last modified: %s" % time.ctime(os.path.getmtime("test.txt")))
-    print("Created: %s" % time.ctime(os.path.getctime("test.txt")))
+    # /Users/tonyskinner/Documents/phoneImages/IMG_20190201_070709.jpg
 
-    # gives the create time as a unix timestamp
-    create_time = os.stat("test.txt").st_ctime
+    image_path = "/Users/tonyskinner/Documents/phoneImages"
 
-    # returns a datetime object
-    create_datetime = datetime.fromtimestamp(create_time)
+    image_operations = image_operations.ImageOperations(image_path)
 
-    # print the year
-    print(create_datetime.strftime("%Y"))
+
+    # print("Last modified: %s" % time.ctime(os.path.getmtime("/Users/tonyskinner/Documents/phoneImages/IMG_20190201_070709.jpg")))
+    # print(time.ctime(os.path.getmtime("/Users/tonyskinner/Documents/phoneImages/IMG_20190201_070709.jpg")))
+    # print("Created: %s" % time.ctime(os.path.getctime("/Users/tonyskinner/Documents/phoneImages/IMG_20190201_070709.jpg")))
+
+    image_list = image_operations.get_list_of_images_in_path()
+
+    for image in image_list:
+        print(image_operations.get_image_last_modified_year(image))
+
 
