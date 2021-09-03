@@ -8,7 +8,7 @@ I have used this to assist me in uploading images to Amazon's Cloud Drive.
 
 ##Usage
 Specify the folder which you would like to sort as an argument when you call the main script
-e.g ``python main.py --/users/bob/media`` would sort the media folder for the user Bob. If no full path is specified then the script will error
+e.g ``python main.py --media=/users/bob/media`` would sort the media folder for the user Bob. If no full path is specified then the script will error
 
 
 ##Final Structure

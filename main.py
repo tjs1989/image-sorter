@@ -3,6 +3,7 @@ import os
 import file_operations
 import folder_operations
 import file_format_config
+import argparse
 
 logging.basicConfig(
     level=logging.INFO,
@@ -51,9 +52,12 @@ def clear_log_file():
 
 
 if __name__ == '__main__':
-    clear_log_file()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--media', help="The full path to the folder where your media is located", required=True)
+    args = parser.parse_args()
+    file_folder_path = args.media
 
-    file_folder_path = "/Users/tonyskinner/Documents/phoneImages"
+    clear_log_file()
 
     file_operations = file_operations.FileOperations(file_folder_path)
     folder_operations = folder_operations.FolderOperations(file_folder_path)
