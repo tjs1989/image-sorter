@@ -5,7 +5,7 @@ Example taken from https://mike.depalatis.net/blog/simplifying-argparse.html
 import logging
 from argparse import ArgumentParser
 from config.setup import get_system_config
-from sort.sort_images import put_images_into_folders
+from sort import sort_files
 
 version = 2.0
 
@@ -50,9 +50,10 @@ def subcommand(args=None, parent=subparsers):
     return decorator
 
 
-@subcommand([argument("-f", "--folder", help="The full path to the folder where your media is located")])
+@subcommand([argument("-f", "--folder", help="The full path to the folder where your media is located", required=True)])
 def sort(args):
-    put_images_into_folders(args.folder)
+    file_sort_class = sort_files.SortFiles(args.folder)
+    file_sort_class.sort_files_into_folders()
 
 
 @subcommand([argument("-f", "--folder", help="The full path where you would like to delete images less than 1MB in")])
