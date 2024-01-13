@@ -1,0 +1,6 @@
+logging_formats:
+  string_format: "%(asctime)s: %(levelname)s: %(message)s"
+  "date_format": "%d-%m-%Y %H:%M:%S"
+date_time_formats:
+    "dmy_slashes": "%d/%m/%Y"
+    "dmy": "%d%m%y"
