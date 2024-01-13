@@ -1,4 +1,3 @@
-import file_format_config
 import os
 
 from system_operations import file_operations
@@ -23,31 +22,40 @@ class SortFiles:
     def create_folder_if_non_existent(self, folder_name):
         if not self.folder_operations.does_folder_exist_in_path(folder_name):
             self.folder_operations.create_folder(folder_name=folder_name)
+
     def create_initial_folder_structure(self):
         for folder_name in self.system_config['initial_folder_structure']:
             self.create_folder_if_non_existent(folder_name)
-
 
     def process_files_in_file_list(self, list_of_files, file_type):
         for file in list_of_files:
             file_details = self.file_operations.get_file_last_modified_details(file)
 
-            self.create_year_and_month_structure_if_it_does_not_exist(file_details=file_details, file_type=file_type)
+            # self.create_year_and_month_structure_if_it_does_not_exist(file_details=file_details, file_type=file_type)
 
             sorted_file_new_folder_path = f"{file_type}/" \
                                           f"{file_details['modified_year']}/" \
                                           f"{file_details['modified_month']}" \
                                           f"/{file_details['modified_date']}"
 
-            self.create_initial_folder_structure(folder_name=sorted_file_new_folder_path)
+            print(sorted_file_new_folder_path)
 
-            self.folder_operations.move_file_to_folder(file_name=os.path.basename(file),
-                                                       new_folder_path=sorted_file_new_folder_path)
+            # self.create_initial_folder_structure(folder_name=sorted_file_new_folder_path)
+            #
+            # self.folder_operations.move_file_to_folder(file_name=os.path.basename(file),
+            #                                            new_folder_path=sorted_file_new_folder_path)
+
 
     def sort_files_into_folders(self):
         self.create_initial_folder_structure()
 
+        image_files_list = self.file_operations.get_list_of_files_in_path_by_type(
+            file_extension_types=self.system_config['image_file_extensions'])
 
-            # file_list = self.file_operations.get_list_of_files_in_path_by_type(file_type=folder_name)
-            #
-            # self.process_files_in_file_list(file_list, file_type=folder_name)
+        video_files_list = self.file_operations.get_list_of_files_in_path_by_type(
+            file_extension_types=self.system_config['video_file_extensions'])
+
+        audio_files_list = self.file_operations.get_list_of_files_in_path_by_type(
+            file_extension_types=self.system_config['audio_file_extensions'])
+
+        self.process_files_in_file_list(image_files_list)

@@ -9,3 +9,16 @@ initial_folder_structure:
    - "Images"
    - "Videos"
    - "Audio"
+image_file_extensions:
+  - ".jpg"
+  - ".png"
+  - ".gif"
+  - ".jpeg"
+  - ".heic"
+video_file_extensions:
+  - ".mp4"
+  - ".mov"
+  - ".avi"
+audio_file_extensions:
+  - ".mp3"
+  - ".wav"

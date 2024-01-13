@@ -19,19 +19,11 @@ class FileOperations:
         }
         return file_details
 
-    def get_list_of_files_in_path_by_type(self, file_type):
+    def get_list_of_files_in_path_by_type(self, file_extension_types):
         file_list = []
-
-        if file_type == file_format_config.supported_file_types['Image Files']:
-            file_extension_types = file_format_config.image_file_extensions
-        elif file_type == file_format_config.supported_file_types['Video Files']:
-            file_extension_types = file_format_config.video_file_extensions
-        elif file_type == file_format_config.supported_file_types['Audio Files']:
-            file_extension_types = file_format_config.audio_file_extensions
-        else:
-            raise Exception("Specified file type is not supported ")
 
         for file_extension in file_extension_types:
             file_list.append(glob.glob(f"{self.files_path}/*{file_extension}"))
 
-        return [y for x in file_list for y in x]
+        return [file for files in file_list for file in files]
+
