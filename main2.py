@@ -5,6 +5,7 @@ Example taken from https://mike.depalatis.net/blog/simplifying-argparse.html
 import logging
 from argparse import ArgumentParser
 from config.setup import get_system_config
+from sort.sort_images import put_images_into_folders
 
 version = 2.0
 
@@ -17,11 +18,16 @@ subparsers = cli.add_subparsers(dest="subcommand")
 def initialise_logger(level):
     system_config_yaml = get_system_config()
 
+    log_file_name = system_config_yaml['log_file_name']
+    file = open(log_file_name, "w+")
+    file.truncate(0)
+    file.close()
+
     logging.basicConfig(level=level,
                         format=system_config_yaml['logging_formats']['string_format'],
                         datefmt=system_config_yaml['logging_formats']['date_format'],
                         handlers=[
-                            logging.FileHandler("debug.log"),
+                            logging.FileHandler(log_file_name),
                             logging.StreamHandler()
                         ]
                         )
@@ -46,12 +52,13 @@ def subcommand(args=None, parent=subparsers):
 
 @subcommand([argument("-f", "--folder", help="The full path to the folder where your media is located")])
 def sort(args):
-    print(args.folder)
+    put_images_into_folders(args.folder)
 
 
 @subcommand([argument("-f", "--folder", help="The full path where you would like to delete images less than 1MB in")])
 def delete(args):
     print(args.folder)
+    logging.info("hi")
 
 
 

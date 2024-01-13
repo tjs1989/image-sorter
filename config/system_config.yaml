@@ -4,3 +4,4 @@ logging_formats:
 date_time_formats:
     "dmy_slashes": "%d/%m/%Y"
     "dmy": "%d%m%y"
+log_file_name: "debug.log"
