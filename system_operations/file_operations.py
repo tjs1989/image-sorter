@@ -29,3 +29,8 @@ class FileOperations:
 
         return [file for files in file_list for file in files]
 
+    @staticmethod
+    def delete_file(filepath):
+        os.remove(filepath)
+
+

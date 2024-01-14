@@ -27,3 +27,11 @@ class FolderOperations:
             }
 
         return folders_with_files
+
+    @staticmethod
+    def get_files_in_folder(path):
+        return [files for _, _, files in os.walk(path) if not files[0][0] == '.']
+
+    @staticmethod
+    def remove_folder(path):
+        os.rmdir(path)

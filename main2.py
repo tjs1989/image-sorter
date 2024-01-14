@@ -3,6 +3,7 @@ Example taken from https://mike.depalatis.net/blog/simplifying-argparse.html
 """
 
 import logging
+import os
 from argparse import ArgumentParser
 from config.setup import get_system_config
 from sort import sort_files
@@ -59,9 +60,10 @@ def sort(args):
 
 @subcommand([argument("-f", "--folder", help="The full path where you would like to delete images less than 1MB in")])
 def delete(args):
-    file_deletion = delete_files.DeleteFiles("/Users/tony/Desktop/thing2")
-    file_deletion.locate_and_delete_files()
+    file_deletion = delete_files.DeleteFiles(args.folder)
+    file_deletion.delete_files_less_than_desired_size()
 
+    file_deletion.remove_empty_post_delete_folders()
 
 
 if __name__ == "__main__":
