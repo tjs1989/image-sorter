@@ -4,6 +4,8 @@ logging_formats:
 date_time_formats:
     "dmy_slashes": "%d/%m/%Y"
     "dmy": "%d%m%y"
+    "year": "%Y"
+    "full_month_name": "%B"
 log_file_name: "debug.log"
 initial_folder_structure:
    - "Images"

@@ -34,14 +34,10 @@ class SortFiles:
             self.folder_operations.create_filepath(new_file_folder_path)
             logging.info(f"Creating the path {new_file_folder_path} if it does not exist")
 
-            current_file_folder_path = f"{self.filepath}/{file_name}"
+            current_file_full_folder_path = f"{self.filepath}/{file_name}"
 
-            print(current_file_folder_path)
-            print(new_file_folder_path)
-            quit()
-
-            self.folder_operations.move_file_to_folder(current_path=current_file_folder_path,
-                                                       new_path=new_file_folder_path)
+            self.folder_operations.move_file_to_folder(current_path=current_file_full_folder_path,
+                                                       new_path=f"{new_file_folder_path}/{file_name}")
 
             logging.info(f"Moved {file_name} to {new_file_folder_path}")
 
