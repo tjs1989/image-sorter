@@ -3,6 +3,7 @@ logging_formats:
   "date_format": "%d-%m-%Y %H:%M:%S"
 date_time_formats:
     "dmy_slashes": "%d/%m/%Y"
+    "dmy_dashes": "%d-%m-%y"
     "dmy": "%d%m%y"
     "year": "%Y"
     "full_month_name": "%B"

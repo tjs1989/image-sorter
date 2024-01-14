@@ -15,7 +15,7 @@ class FileOperations:
 
         file_details = {
             "modified_year": modified_datetime.strftime(self.system_config['date_time_formats']['year']),
-            "modified_date": modified_datetime.strftime(self.system_config['date_time_formats']['dmy_slashes']),
+            "modified_date": modified_datetime.strftime(self.system_config['date_time_formats']['dmy_dashes']),
             "modified_month": modified_datetime.strftime(self.system_config['date_time_formats']['full_month_name'])
         }
 
