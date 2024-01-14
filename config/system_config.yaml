@@ -25,3 +25,4 @@ video_file_extensions:
 audio_file_extensions:
   - ".mp3"
   - ".wav"
+one_megabyte_in_bytes: 1000000

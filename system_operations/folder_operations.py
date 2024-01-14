@@ -1,4 +1,3 @@
-import logging
 import os
 from pathlib import Path
 
@@ -12,3 +11,19 @@ class FolderOperations:
 
     def move_file_to_folder(self, current_path, new_path):
         os.rename(current_path, new_path)
+
+    def locate_folders_with_files(self):
+        folders_with_files = {}
+
+        for root, dirs, files in os.walk(self.folder_path):
+            if files[0][0] == '.':
+                continue
+
+            for x in range(0, len(files)):
+                files[x] = f"{root}/{files[x]}"
+
+            folders_with_files[root] = {
+                "files_with_path": files
+            }
+
+        return folders_with_files

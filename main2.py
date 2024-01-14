@@ -6,6 +6,7 @@ import logging
 from argparse import ArgumentParser
 from config.setup import get_system_config
 from sort import sort_files
+from delete import delete_files
 
 version = 2.0
 
@@ -58,8 +59,8 @@ def sort(args):
 
 @subcommand([argument("-f", "--folder", help="The full path where you would like to delete images less than 1MB in")])
 def delete(args):
-    print(args.folder)
-    logging.info("hi")
+    file_deletion = delete_files.DeleteFiles("/Users/tony/Desktop/thing2")
+    file_deletion.locate_and_delete_files()
 
 
 
