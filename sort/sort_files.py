@@ -4,7 +4,6 @@ import os
 from system_operations import file_operations
 from system_operations import folder_operations
 from config import setup
-from pathlib import Path
 
 
 class SortFiles:
