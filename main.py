@@ -1,70 +1,80 @@
+"""
+Example taken from https://mike.depalatis.net/blog/simplifying-argparse.html
+"""
+
 import logging
 import os
-import file_operations
-import folder_operations
-import file_format_config
-import argparse
+from argparse import ArgumentParser
+from config.setup import get_system_config
+from sort import sort_files
+from delete import delete_files
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("debug.log"),
-        logging.StreamHandler()
-    ]
-)
+version = 2.0
+
+cli = ArgumentParser(description="Image Sorter")
+cli.add_argument("-d", "--debug", help="enable debug logger", action='store_true')
+cli.add_argument("-v", "--version", action="version", version=f"Image Sorter {version}")
+subparsers = cli.add_subparsers(dest="subcommand")
 
 
-def create_year_and_month_structure_if_it_does_not_exist(file_details, file_type):
-    year_folder_path = f"{file_type}/{file_details['modified_year']}"
-    month_folder_path = f"{year_folder_path}/{file_details['modified_month']}"
+def initialise_logger(level):
+    system_config_yaml = get_system_config()
 
-    create_folder_if_it_does_not_exist(folder_name=year_folder_path)
-    create_folder_if_it_does_not_exist(folder_name=month_folder_path)
-
-
-def create_folder_if_it_does_not_exist(folder_name):
-    if not folder_operations.does_folder_exist_in_path(folder_name):
-        folder_operations.create_folder(folder_name=folder_name)
-
-
-def process_files_in_file_list(list_of_files, file_type):
-    for file in list_of_files:
-        file_details = file_operations.get_file_last_modified_details(file)
-
-        create_year_and_month_structure_if_it_does_not_exist(file_details=file_details, file_type=file_type)
-
-        sorted_file_new_folder_path = f"{file_type}/" \
-                                      f"{file_details['modified_year']}/" \
-                                      f"{file_details['modified_month']}" \
-                                      f"/{file_details['modified_date']}"
-
-        create_folder_if_it_does_not_exist(folder_name=sorted_file_new_folder_path)
-
-        folder_operations.move_file_to_folder(file_name=os.path.basename(file),
-                                              new_folder_path=sorted_file_new_folder_path)
-
-
-def clear_log_file():
-    file = open("debug.log", "r+")
+    log_file_name = system_config_yaml['log_file_name']
+    file = open(log_file_name, "w+")
     file.truncate(0)
     file.close()
 
+    logging.basicConfig(level=level,
+                        format=system_config_yaml['logging_formats']['string_format'],
+                        datefmt=system_config_yaml['logging_formats']['date_format'],
+                        handlers=[
+                            logging.FileHandler(log_file_name),
+                            logging.StreamHandler()
+                        ]
+                        )
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-m', '--media', help="The full path to the folder where your media is located", required=True)
-    args = parser.parse_args()
-    file_folder_path = args.media
 
-    clear_log_file()
+def argument(*name_or_flags, **kwargs):
+    return list(name_or_flags), kwargs
 
-    file_operations = file_operations.FileOperations(file_folder_path)
-    folder_operations = folder_operations.FolderOperations(file_folder_path)
 
-    for file_type in file_format_config.supported_file_types.values():
-        create_folder_if_it_does_not_exist(folder_name=file_type)
+def subcommand(args=None, parent=subparsers):
+    if args is None:
+        args = []
 
-        file_list = file_operations.get_list_of_files_in_path_by_type(file_type=file_type)
+    def decorator(func):
+        parser = parent.add_parser(func.__name__, description=func.__doc__)
+        for arg in args:
+            parser.add_argument(*arg[0], **arg[1])
+        parser.set_defaults(func=func)
 
-        process_files_in_file_list(file_list, file_type=file_type)
+    return decorator
+
+
+@subcommand([argument("-f", "--folder", help="The full path to the folder where your media is located", required=True)])
+def sort(args):
+    file_sort_class = sort_files.SortFiles(args.folder)
+    file_sort_class.sort_files_into_folders()
+
+
+@subcommand([argument("-f", "--folder", help="The full path where you would like to delete images less than 1MB in")])
+def delete(args):
+    file_deletion = delete_files.DeleteFiles(args.folder)
+    file_deletion.delete_files_less_than_desired_size()
+
+    file_deletion.remove_empty_post_delete_folders()
+
+
+if __name__ == "__main__":
+    args = cli.parse_args()
+
+    if args.debug:
+        initialise_logger(level=logging.DEBUG)
+    else:
+        initialise_logger(level=logging.INFO)
+
+    if args.subcommand is None:
+        cli.print_help()
+    else:
+        args.func(args)
