@@ -33,7 +33,10 @@ class FolderOperations:
 
     @staticmethod
     def get_files_in_folder(path):
-        return [files for _, _, files in os.walk(path) if not files[0][0] == '.']
+        try:
+            return [files for _, _, files in os.walk(path) if not files[0][0] == '.']
+        except IndexError:
+            return []
 
     @staticmethod
     def remove_folder(path):
