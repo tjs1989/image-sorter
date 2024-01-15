@@ -1,3 +1,4 @@
+import itertools
 import os
 from pathlib import Path
 
@@ -16,7 +17,10 @@ class FolderOperations:
         folders_with_files = {}
 
         for root, dirs, files in os.walk(self.folder_path):
-            if files[0][0] == '.':
+            try:
+                if files[0][0] == '.':
+                    continue
+            except IndexError:
                 continue
 
             for x in range(0, len(files)):
@@ -25,7 +29,6 @@ class FolderOperations:
             folders_with_files[root] = {
                 "files_with_path": files
             }
-
         return folders_with_files
 
     @staticmethod
