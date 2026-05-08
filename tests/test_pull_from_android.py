@@ -1,3 +1,4 @@
+import os
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -8,32 +9,6 @@ from pull.pull_from_android import PullFromAndroid
 @pytest.fixture
 def puller(tmp_path):
     return PullFromAndroid(str(tmp_path))
-
-
-def _devices_stdout(*lines):
-    body = "\n".join(lines)
-    return f"List of devices attached\n{body}\n"
-
-
-@pytest.mark.parametrize(
-    "which_returns,devices_stdout,expected_error",
-    [
-        pytest.param("/usr/local/bin/adb", _devices_stdout("ABCD\tdevice"), None, id="happy"),
-        pytest.param(None, "", "adb not found", id="missing-adb"),
-        pytest.param("/usr/local/bin/adb", "List of devices attached\n\n", "No authorized", id="no-device"),
-        pytest.param("/usr/local/bin/adb", _devices_stdout("ABCD\tunauthorized"), "unauthorized", id="unauthorized"),
-        pytest.param("/usr/local/bin/adb", _devices_stdout("AAA\tdevice", "BBB\tdevice"), "Multiple devices", id="multi-device"),
-    ],
-)
-def test_verify_adb_available(which_returns, devices_stdout, expected_error, puller):
-    with patch("pull.pull_from_android.shutil.which", return_value=which_returns), \
-         patch("pull.pull_from_android.subprocess.run",
-               return_value=MagicMock(stdout=devices_stdout, stderr="", returncode=0)):
-        if expected_error is None:
-            puller.verify_adb_available()
-        else:
-            with pytest.raises(RuntimeError, match=expected_error):
-                puller.verify_adb_available()
 
 
 @patch("pull.pull_from_android.subprocess.run")
@@ -67,10 +42,11 @@ def test_pull_folders_continues_when_one_path_fails(mock_run, puller):
 
 
 @patch.object(PullFromAndroid, "pull_folders")
-@patch.object(PullFromAndroid, "verify_adb_available")
-def test_pull_orchestrates_verify_then_pull(mock_verify, mock_pull, puller):
-    import os
+def test_pull_orchestrates_verify_then_pull(mock_pull, puller):
+    puller.adb_availability = MagicMock()
+
     puller.pull()
-    mock_verify.assert_called_once()
+
+    puller.adb_availability.verify.assert_called_once()
     mock_pull.assert_called_once()
     assert os.path.isdir(puller.destination_path)
