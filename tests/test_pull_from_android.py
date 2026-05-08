@@ -15,49 +15,25 @@ def _devices_stdout(*lines):
     return f"List of devices attached\n{body}\n"
 
 
-@patch("pull.pull_from_android.shutil.which", return_value="/usr/local/bin/adb")
-@patch("pull.pull_from_android.subprocess.run")
-def test_verify_adb_available_happy_path(mock_run, mock_which, puller):
-    mock_run.return_value = MagicMock(
-        stdout=_devices_stdout("ABCD1234\tdevice"), stderr="", returncode=0
-    )
-    puller.verify_adb_available()
-
-
-@patch("pull.pull_from_android.shutil.which", return_value=None)
-def test_verify_adb_available_missing_adb(mock_which, puller):
-    with pytest.raises(RuntimeError, match="adb not found"):
-        puller.verify_adb_available()
-
-
-@patch("pull.pull_from_android.shutil.which", return_value="/usr/local/bin/adb")
-@patch("pull.pull_from_android.subprocess.run")
-def test_verify_adb_available_no_device(mock_run, mock_which, puller):
-    mock_run.return_value = MagicMock(
-        stdout="List of devices attached\n\n", stderr="", returncode=0
-    )
-    with pytest.raises(RuntimeError, match="No authorized"):
-        puller.verify_adb_available()
-
-
-@patch("pull.pull_from_android.shutil.which", return_value="/usr/local/bin/adb")
-@patch("pull.pull_from_android.subprocess.run")
-def test_verify_adb_available_unauthorized(mock_run, mock_which, puller):
-    mock_run.return_value = MagicMock(
-        stdout=_devices_stdout("ABCD1234\tunauthorized"), stderr="", returncode=0
-    )
-    with pytest.raises(RuntimeError, match="unauthorized"):
-        puller.verify_adb_available()
-
-
-@patch("pull.pull_from_android.shutil.which", return_value="/usr/local/bin/adb")
-@patch("pull.pull_from_android.subprocess.run")
-def test_verify_adb_available_multiple_devices(mock_run, mock_which, puller):
-    mock_run.return_value = MagicMock(
-        stdout=_devices_stdout("AAA\tdevice", "BBB\tdevice"), stderr="", returncode=0
-    )
-    with pytest.raises(RuntimeError, match="Multiple devices"):
-        puller.verify_adb_available()
+@pytest.mark.parametrize(
+    "which_returns,devices_stdout,expected_error",
+    [
+        pytest.param("/usr/local/bin/adb", _devices_stdout("ABCD\tdevice"), None, id="happy"),
+        pytest.param(None, "", "adb not found", id="missing-adb"),
+        pytest.param("/usr/local/bin/adb", "List of devices attached\n\n", "No authorized", id="no-device"),
+        pytest.param("/usr/local/bin/adb", _devices_stdout("ABCD\tunauthorized"), "unauthorized", id="unauthorized"),
+        pytest.param("/usr/local/bin/adb", _devices_stdout("AAA\tdevice", "BBB\tdevice"), "Multiple devices", id="multi-device"),
+    ],
+)
+def test_verify_adb_available(which_returns, devices_stdout, expected_error, puller):
+    with patch("pull.pull_from_android.shutil.which", return_value=which_returns), \
+         patch("pull.pull_from_android.subprocess.run",
+               return_value=MagicMock(stdout=devices_stdout, stderr="", returncode=0)):
+        if expected_error is None:
+            puller.verify_adb_available()
+        else:
+            with pytest.raises(RuntimeError, match=expected_error):
+                puller.verify_adb_available()
 
 
 @patch("pull.pull_from_android.subprocess.run")
@@ -84,8 +60,7 @@ def test_pull_folders_continues_when_one_path_fails(mock_run, puller):
     mock_run.side_effect = [
         MagicMock(stdout="", stderr="remote object does not exist", returncode=1)
     ] + [
-        MagicMock(stdout="", stderr="", returncode=0)
-        for _ in range(expected_count - 1)
+        MagicMock(stdout="", stderr="", returncode=0) for _ in range(expected_count - 1)
     ]
     puller.pull_folders()
     assert mock_run.call_count == expected_count
@@ -94,9 +69,8 @@ def test_pull_folders_continues_when_one_path_fails(mock_run, puller):
 @patch.object(PullFromAndroid, "pull_folders")
 @patch.object(PullFromAndroid, "verify_adb_available")
 def test_pull_orchestrates_verify_then_pull(mock_verify, mock_pull, puller):
+    import os
     puller.pull()
     mock_verify.assert_called_once()
     mock_pull.assert_called_once()
-    # destination dir created as a side effect
-    import os
     assert os.path.isdir(puller.destination_path)

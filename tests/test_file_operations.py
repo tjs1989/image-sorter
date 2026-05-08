@@ -42,18 +42,14 @@ def test_excludes_top_level_dirs(tmp_path):
     assert files[0].endswith("fresh.jpg")
 
 
-def test_no_matching_files_returns_empty(tmp_path):
-    _touch(tmp_path / "readme.txt")
-    files = FileOperations(str(tmp_path)).get_list_of_files_in_path_by_type([".jpg"])
-    assert files == []
-
-
-def test_filters_extensions_not_in_list(tmp_path):
+def test_filters_to_only_requested_extensions(tmp_path):
     _touch(tmp_path / "a.jpg")
     _touch(tmp_path / "b.txt")
     _touch(tmp_path / "c.mp4")
 
-    files = FileOperations(str(tmp_path)).get_list_of_files_in_path_by_type([".jpg"])
+    fo = FileOperations(str(tmp_path))
 
-    assert len(files) == 1
-    assert files[0].endswith("a.jpg")
+    matched = fo.get_list_of_files_in_path_by_type([".jpg"])
+    assert [f.rsplit("/", 1)[-1] for f in matched] == ["a.jpg"]
+
+    assert fo.get_list_of_files_in_path_by_type([".heic"]) == []
