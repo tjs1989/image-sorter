@@ -26,3 +26,8 @@ audio_file_extensions:
   - ".mp3"
   - ".wav"
 one_megabyte_in_bytes: 1000000
+android_source_paths:
+  - "/sdcard/DCIM"
+  - "/sdcard/Pictures"
+  - "/sdcard/Movies"
+  - "/sdcard/Music"
