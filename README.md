@@ -31,6 +31,6 @@ Prerequisites:
 - Enable Developer Options and USB debugging on the phone, then accept the USB debugging prompt when you plug it in.
 
 Then:
-``python main.py pullfromandroid -f=/users/bob/media`` will copy `/sdcard/DCIM`, `/sdcard/Pictures`, `/sdcard/Movies` and `/sdcard/Music` into `/users/bob/media`, preserving the phone's subfolder structure. After it finishes, run ``python main.py sort -f=/users/bob/media`` and the sort will recurse into those folders.
+``python main.py pullmedia -f=/users/bob/media`` will copy `/sdcard/DCIM`, `/sdcard/Pictures`, `/sdcard/Movies` and `/sdcard/Music` into `/users/bob/media`, preserving the phone's subfolder structure. After it finishes, run ``python main.py sort -f=/users/bob/media`` and the sort will recurse into those folders.
 
 The list of source paths on the device is configurable via ``android_source_paths`` in ``config/system_config.yaml``.

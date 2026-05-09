@@ -2,7 +2,7 @@ import shutil
 import subprocess
 
 
-class AdbAvailability:
+class Availability:
     def verify(self):
         if shutil.which("adb") is None:
             raise RuntimeError(

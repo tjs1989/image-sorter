@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from pull.adb_availability import AdbAvailability
+from adb.availability import Availability
 
 
 def _devices_stdout(*lines):
@@ -21,11 +21,11 @@ def _devices_stdout(*lines):
     ],
 )
 def test_verify(which_returns, devices_stdout, expected_error):
-    with patch("pull.adb_availability.shutil.which", return_value=which_returns), \
-         patch("pull.adb_availability.subprocess.run",
+    with patch("adb.availability.shutil.which", return_value=which_returns), \
+         patch("adb.availability.subprocess.run",
                return_value=MagicMock(stdout=devices_stdout, stderr="", returncode=0)):
         if expected_error is None:
-            AdbAvailability().verify()
+            Availability().verify()
         else:
             with pytest.raises(RuntimeError, match=expected_error):
-                AdbAvailability().verify()
+                Availability().verify()

@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 from config.setup import get_system_config
 from sort import sort_files
 from delete import delete_files
-from pull import pull_from_android
+from adb import pull_media
 
 version = 2.0
 
@@ -68,8 +68,8 @@ def delete(args):
 
 
 @subcommand([argument("-f", "--folder", help="The full local path to pull files into from the connected Android device", required=True)])
-def pullfromandroid(args):
-    puller = pull_from_android.PullFromAndroid(args.folder)
+def pullmedia(args):
+    puller = pull_media.PullMedia(args.folder)
     puller.pull()
 
 

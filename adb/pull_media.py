@@ -2,16 +2,16 @@ import logging
 import subprocess
 
 from config.setup import get_system_config
-from pull.adb_availability import AdbAvailability
+from adb.availability import Availability
 from system_operations.folder_operations import FolderOperations
 
 
-class PullFromAndroid:
+class PullMedia:
     def __init__(self, destination_path):
         self.destination_path = destination_path
         self.system_config = get_system_config()
         self.folder_operations = FolderOperations(destination_path)
-        self.adb_availability = AdbAvailability()
+        self.availability = Availability()
 
     def pull_folders(self):
         for remote_path in self.system_config["android_source_paths"]:
@@ -30,6 +30,6 @@ class PullFromAndroid:
                 logging.info(result.stdout.strip())
 
     def pull(self):
-        self.adb_availability.verify()
+        self.availability.verify()
         self.folder_operations.create_filepath(self.destination_path)
         self.pull_folders()
