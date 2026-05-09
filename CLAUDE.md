@@ -49,7 +49,7 @@ Adding a new image format, changing the delete threshold, or renaming the top-le
 
 ## Behavioural details worth knowing
 
-- **Sort uses `mtime`, not EXIF.** `FileOperations.get_file_last_modified_details` reads `os.stat(...).st_mtime`. Files copied/restored from backups will sort by the copy date, not the photo date. `adb pull` preserves mtime, so the `pullmedia` → `sort` flow keeps original capture dates.
+- **Sort uses `mtime`, not EXIF.** `FileOperations.get_file_last_modified_details` reads `os.stat(...).st_mtime`. Files copied/restored from backups will sort by the copy date, not the photo date. `pullmedia` runs `adb pull -a`, where `-a` is what preserves the on-device mtime — without it the local copy gets the pull-time as its mtime and `sort` would group everything under the pull date.
 - **Sort recurses but skips its own output dirs.** `get_list_of_files_in_path_by_type` walks subdirectories so files pulled into `DCIM/Camera/`, `Pictures/Screenshots/`, etc. are picked up. The top-level `Images/Videos/Audio/` folders (from `initial_folder_structure`) are pruned from the walk so re-runs don't re-process already-sorted output. Extension match is case-insensitive (`.JPG` works).
 - **Delete is recursive and only operates on already-sorted trees.** `DeleteFiles` walks the whole tree via `FolderOperations.locate_folders_with_files`, so it's intended to run after a `sort`.
 - **Hidden-file quirk in `folder_operations.py`.** `locate_folders_with_files` and `get_files_in_folder` skip a folder entirely if its **first** file (per `os.walk` ordering) starts with `.` — e.g. a single `.DS_Store` can hide all sibling files from the delete pass. Be aware before "fixing" this; it's load-bearing for ignoring macOS metadata folders.
