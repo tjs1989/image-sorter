@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 from config.setup import get_system_config
 
 
@@ -22,16 +23,16 @@ class FileOperations:
 
     def get_list_of_files_in_path_by_type(self, file_extension_types, exclude_top_level_dirs=None):
         excluded = set(exclude_top_level_dirs or [])
-        extensions = tuple(ext.lower() for ext in file_extension_types)
+        base = Path(self.files_path)
+        file_list = []
 
-        matches = []
-        for root, dirs, files in os.walk(self.files_path):
-            if root == self.files_path and excluded:
-                dirs[:] = [d for d in dirs if d not in excluded]
-            for name in files:
-                if name.lower().endswith(extensions):
-                    matches.append(os.path.join(root, name))
-        return matches
+        for file_extension in file_extension_types:
+            file_list.append(list(base.rglob(f"*{file_extension}", case_sensitive=False)))
+
+        return [
+            str(p) for paths in file_list for p in paths
+            if excluded.isdisjoint(p.relative_to(base).parts[:1])
+        ]
 
     @staticmethod
     def delete_file(filepath):
