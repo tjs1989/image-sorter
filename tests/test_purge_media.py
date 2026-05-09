@@ -49,40 +49,20 @@ def test_trigger_media_rescan_invokes_content_scan_volume(mock_run, purger):
     assert "name:s:external_primary" in cmd
 
 
+@pytest.mark.parametrize(
+    "user_input,should_purge",
+    [("confirm", True), ("no", False), ("Confirm", False)],
+    ids=["confirmed", "rejected", "wrong_case"],
+)
 @patch.object(PurgeMedia, "trigger_media_rescan")
 @patch.object(PurgeMedia, "purge_folders")
-@patch("builtins.input", return_value="confirm")
-def test_purge_runs_when_confirmed(mock_input, mock_purge, mock_rescan, purger):
-    purger.availability = MagicMock()
-    purger.purge()
-
-    purger.availability.verify.assert_called_once()
-    mock_purge.assert_called_once()
-    mock_rescan.assert_called_once()
-
-
-@patch.object(PurgeMedia, "trigger_media_rescan")
-@patch.object(PurgeMedia, "purge_folders")
-@patch("builtins.input", return_value="no")
-def test_purge_aborts_when_confirmation_token_not_typed(
-    mock_input, mock_purge, mock_rescan, purger
+def test_purge_runs_only_when_token_typed_exactly(
+    mock_purge, mock_rescan, purger, user_input, should_purge
 ):
     purger.availability = MagicMock()
-    purger.purge()
+    with patch("builtins.input", return_value=user_input):
+        purger.purge()
 
     purger.availability.verify.assert_called_once()
-    mock_purge.assert_not_called()
-    mock_rescan.assert_not_called()
-
-
-@patch.object(PurgeMedia, "trigger_media_rescan")
-@patch.object(PurgeMedia, "purge_folders")
-@patch("builtins.input", return_value="Confirm")
-def test_purge_confirmation_is_case_sensitive(
-    mock_input, mock_purge, mock_rescan, purger
-):
-    purger.availability = MagicMock()
-    purger.purge()
-
-    mock_purge.assert_not_called()
-    mock_rescan.assert_not_called()
+    assert mock_purge.called is should_purge
+    assert mock_rescan.called is should_purge
