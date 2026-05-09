@@ -1,6 +1,6 @@
-import glob
 import os
 from datetime import datetime
+from pathlib import Path
 from config.setup import get_system_config
 
 
@@ -21,13 +21,18 @@ class FileOperations:
 
         return file_details
 
-    def get_list_of_files_in_path_by_type(self, file_extension_types):
+    def get_list_of_files_in_path_by_type(self, file_extension_types, exclude_top_level_dirs=None):
+        excluded = set(exclude_top_level_dirs or [])
+        base = Path(self.files_path)
         file_list = []
 
         for file_extension in file_extension_types:
-            file_list.append(glob.glob(f"{self.files_path}/*{file_extension}"))
+            file_list.append(list(base.rglob(f"*{file_extension}", case_sensitive=False)))
 
-        return [file for files in file_list for file in files]
+        return [
+            str(p) for paths in file_list for p in paths
+            if excluded.isdisjoint(p.relative_to(base).parts[:1])
+        ]
 
     @staticmethod
     def delete_file(filepath):

@@ -33,9 +33,7 @@ class SortFiles:
             self.folder_operations.create_filepath(new_file_folder_path)
             logging.info(f"Creating the path {new_file_folder_path} if it does not exist")
 
-            current_file_full_folder_path = f"{self.filepath}/{file_name}"
-
-            self.folder_operations.move_file_to_folder(current_path=current_file_full_folder_path,
+            self.folder_operations.move_file_to_folder(current_path=file,
                                                        new_path=f"{new_file_folder_path}/{file_name}")
 
             logging.info(f"Moved {file_name} to {new_file_folder_path}")
@@ -43,14 +41,19 @@ class SortFiles:
     def sort_files_into_folders(self):
         self.create_initial_folder_structure()
 
+        excluded = self.system_config['initial_folder_structure']
+
         image_files_list = self.file_operations.get_list_of_files_in_path_by_type(
-            file_extension_types=self.system_config['image_file_extensions'])
+            file_extension_types=self.system_config['image_file_extensions'],
+            exclude_top_level_dirs=excluded)
 
         video_files_list = self.file_operations.get_list_of_files_in_path_by_type(
-            file_extension_types=self.system_config['video_file_extensions'])
+            file_extension_types=self.system_config['video_file_extensions'],
+            exclude_top_level_dirs=excluded)
 
         audio_files_list = self.file_operations.get_list_of_files_in_path_by_type(
-            file_extension_types=self.system_config['audio_file_extensions'])
+            file_extension_types=self.system_config['audio_file_extensions'],
+            exclude_top_level_dirs=excluded)
 
         self.process_files_in_file_list(image_files_list, "Images")
         self.process_files_in_file_list(video_files_list, "Videos")
