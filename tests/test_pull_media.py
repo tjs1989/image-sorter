@@ -19,14 +19,15 @@ def test_pull_folders_calls_adb_for_each_configured_path(mock_run, puller):
     expected_remote_paths = puller.system_config["android_source_paths"]
     assert mock_run.call_count == len(expected_remote_paths)
 
-    actual_remote_paths = [call.args[0][2] for call in mock_run.call_args_list]
+    actual_remote_paths = [call.args[0][3] for call in mock_run.call_args_list]
     assert actual_remote_paths == expected_remote_paths
 
     for call in mock_run.call_args_list:
         cmd = call.args[0]
         assert cmd[0] == "adb"
         assert cmd[1] == "pull"
-        assert cmd[3] == puller.destination_path
+        assert cmd[2] == "-a"
+        assert cmd[4] == puller.destination_path
 
 
 @patch("adb.pull_media.subprocess.run")

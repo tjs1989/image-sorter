@@ -17,7 +17,7 @@ class PullMedia:
         for remote_path in self.system_config["android_source_paths"]:
             logging.info(f"Pulling {remote_path} into {self.destination_path}")
             result = subprocess.run(
-                ["adb", "pull", remote_path, self.destination_path],
+                ["adb", "pull", "-a", remote_path, self.destination_path],
                 capture_output=True,
                 text=True,
             )
