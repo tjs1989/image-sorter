@@ -21,13 +21,17 @@ class PurgeMedia:
         self.availability = Availability()
 
     def _show_warning(self):
-        print(WARNING_BANNER)
-        print("  !!!  WARNING  !!!  WARNING  !!!  WARNING  !!!\n")
-        print("  This will PERMANENTLY DELETE all media in:")
-        for remote_path in self.system_config["android_source_paths"]:
-            print(f"    - {remote_path}")
-        print("\n  on the connected Android device.")
-        print("  This action is IRREVERSIBLE.\n")
+        paths = "\n".join(
+            f"    - {p}" for p in self.system_config["android_source_paths"]
+        )
+        print(
+            f"{WARNING_BANNER}\n"
+            "  !!!  WARNING  !!!  WARNING  !!!  WARNING  !!!\n\n"
+            "  This will PERMANENTLY DELETE all media in:\n"
+            f"{paths}\n\n"
+            "  on the connected Android device.\n"
+            "  This action is IRREVERSIBLE.\n"
+        )
 
     def _prompt_confirmation(self):
         response = input(
