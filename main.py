@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 from config.setup import get_system_config
 from sort import sort_files
 from delete import delete_files
-from adb import pull_media
+from adb import pull_media, purge_media
 
 version = 2.0
 
@@ -71,6 +71,13 @@ def delete(args):
 def pullmedia(args):
     puller = pull_media.PullMedia(args.folder)
     puller.pull()
+
+
+@subcommand()
+def purgemedia(args):
+    """Delete all media on the connected Android device after typed confirmation."""
+    purger = purge_media.PurgeMedia()
+    purger.purge()
 
 
 if __name__ == "__main__":
