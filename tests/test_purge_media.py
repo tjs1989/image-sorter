@@ -10,12 +10,19 @@ def purger():
     return PurgeMedia()
 
 
+def test_paths_to_purge_is_pull_paths_plus_purge_only_paths(purger):
+    assert purger.paths_to_purge == (
+        purger.system_config["android_source_paths"]
+        + purger.system_config["android_purge_only_paths"]
+    )
+
+
 @patch("adb.purge_media.subprocess.run")
 def test_purge_folders_calls_adb_for_each_configured_path(mock_run, purger):
     mock_run.return_value = MagicMock(stdout="", stderr="", returncode=0)
     purger.purge_folders()
 
-    expected_remote_paths = purger.system_config["android_source_paths"]
+    expected_remote_paths = purger.paths_to_purge
     assert mock_run.call_count == len(expected_remote_paths)
 
     for call, expected_path in zip(mock_run.call_args_list, expected_remote_paths):
@@ -27,7 +34,7 @@ def test_purge_folders_calls_adb_for_each_configured_path(mock_run, purger):
 
 @patch("adb.purge_media.subprocess.run")
 def test_purge_folders_continues_when_one_path_fails(mock_run, purger):
-    expected_count = len(purger.system_config["android_source_paths"])
+    expected_count = len(purger.paths_to_purge)
     mock_run.side_effect = [
         MagicMock(stdout="", stderr="not found", returncode=1)
     ] + [

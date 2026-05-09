@@ -19,11 +19,13 @@ class PurgeMedia:
     def __init__(self):
         self.system_config = get_system_config()
         self.availability = Availability()
+        self.paths_to_purge = (
+            self.system_config["android_source_paths"]
+            + self.system_config.get("android_purge_only_paths", [])
+        )
 
     def _show_warning(self):
-        paths = "\n".join(
-            f"    - {p}" for p in self.system_config["android_source_paths"]
-        )
+        paths = "\n".join(f"    - {p}" for p in self.paths_to_purge)
         print(
             f"{WARNING_BANNER}\n"
             "  !!!  WARNING  !!!  WARNING  !!!  WARNING  !!!\n\n"
@@ -40,7 +42,7 @@ class PurgeMedia:
         return response.strip() == CONFIRMATION_TOKEN
 
     def purge_folders(self):
-        for remote_path in self.system_config["android_source_paths"]:
+        for remote_path in self.paths_to_purge:
             logging.info(f"Purging contents of {remote_path} on device")
             result = subprocess.run(
                 ["adb", "shell", "find", remote_path, "-mindepth", "1", "-delete"],

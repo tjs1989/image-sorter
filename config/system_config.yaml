@@ -31,3 +31,5 @@ android_source_paths:
   - "/sdcard/Pictures"
   - "/sdcard/Movies"
   - "/sdcard/Music"
+android_purge_only_paths:
+  - "/sdcard/Android/media/com.whatsapp/WhatsApp/Media"
