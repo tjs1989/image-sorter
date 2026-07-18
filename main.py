@@ -9,6 +9,7 @@ from config.setup import get_system_config
 from sort import sort_files
 from delete import delete_files
 from adb import pull_media, purge_media
+from drive import push_media
 
 version = 2.0
 
@@ -78,6 +79,16 @@ def purgemedia(args):
     """Delete all media on the connected Android device after typed confirmation."""
     purger = purge_media.PurgeMedia()
     purger.purge()
+
+
+@subcommand([
+    argument("-f", "--folder", help="The full local path to the sorted folder to upload", required=True),
+    argument("-r", "--remote", help="Destination folder path in Google Drive (My Drive)", required=True),
+])
+def pushmedia(args):
+    """Mirror a locally sorted folder tree into Google Drive."""
+    pusher = push_media.PushMedia(args.folder, args.remote)
+    pusher.push()
 
 
 if __name__ == "__main__":

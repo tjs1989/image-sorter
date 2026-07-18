@@ -1,0 +1,2 @@
+pyyaml
+PyDrive2==1.21.3
