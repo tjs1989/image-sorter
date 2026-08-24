@@ -2,10 +2,10 @@ from config.setup import get_system_config
 from main import cli
 
 
-def test_sort_defaults_to_android():
+def test_sort_defaults_to_no_phone_type():
     args = cli.parse_args(["sort", "-f", "/some/path"])
 
-    assert args.phone == "android"
+    assert args.phone is None
 
 
 def test_sort_accepts_every_phone_type_in_the_config():

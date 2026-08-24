@@ -21,7 +21,7 @@ def test_sort_recurses_into_device_layout(tmp_path):
     _touch_with_mtime(tmp_path / "Music" / "memo.m4a", captured)
     _touch_with_mtime(tmp_path / "loose.jpeg", captured)
 
-    SortFiles(str(tmp_path), "android").sort_files_into_folders()
+    SortFiles(str(tmp_path), phone_type=None).sort_files_into_folders()
 
     images_day = tmp_path / "Images" / "2024" / "June" / "15-06-24"
     videos_day = tmp_path / "Videos" / "2024" / "June" / "15-06-24"
@@ -45,7 +45,7 @@ def test_sort_groups_files_by_modified_date(tmp_path):
     _touch_with_mtime(tmp_path / "winter.jpg", jan)
     _touch_with_mtime(tmp_path / "spring.jpg", feb)
 
-    SortFiles(str(tmp_path), "android").sort_files_into_folders()
+    SortFiles(str(tmp_path), phone_type=None).sort_files_into_folders()
 
     assert (tmp_path / "Images" / "2023" / "January" / "05-01-23" / "winter.jpg").exists()
     assert (tmp_path / "Images" / "2023" / "February" / "20-02-23" / "spring.jpg").exists()
@@ -55,8 +55,8 @@ def test_sort_is_idempotent_when_rerun(tmp_path):
     captured = datetime(2024, 6, 15, 12, 0, 0)
     _touch_with_mtime(tmp_path / "DCIM" / "img.jpg", captured)
 
-    SortFiles(str(tmp_path), "android").sort_files_into_folders()
-    SortFiles(str(tmp_path), "android").sort_files_into_folders()
+    SortFiles(str(tmp_path), phone_type=None).sort_files_into_folders()
+    SortFiles(str(tmp_path), phone_type=None).sort_files_into_folders()
 
     target_dir = tmp_path / "Images" / "2024" / "June" / "15-06-24"
     contents = list(target_dir.iterdir())
@@ -80,11 +80,11 @@ def test_sort_discards_iphone_sidecars(tmp_path):
     assert (images_day / "IMG_3.AAE").exists()
 
 
-def test_sort_leaves_sidecars_alone_for_android(tmp_path):
+def test_sort_leaves_sidecars_alone_without_a_phone_type(tmp_path):
     captured = datetime(2024, 6, 15, 12, 0, 0)
     _touch_with_mtime(tmp_path / "IMG_1.AAE", captured)
 
-    SortFiles(str(tmp_path), "android").sort_files_into_folders()
+    SortFiles(str(tmp_path), phone_type=None).sort_files_into_folders()
 
     assert (tmp_path / "IMG_1.AAE").exists()
 

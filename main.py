@@ -13,8 +13,7 @@ from drive import push_media
 
 version = 2.0
 
-default_phone_type = "android"
-supported_phone_types = sorted({default_phone_type, *get_system_config()['discard_file_extensions']})
+supported_phone_types = sorted(get_system_config()['discard_file_extensions'])
 
 cli = ArgumentParser(description="Image Sorter")
 cli.add_argument("-d", "--debug", help="enable debug logger", action='store_true')
@@ -59,8 +58,9 @@ def subcommand(args=None, parent=subparsers):
 
 @subcommand([
     argument("-f", "--folder", help="The full path to the folder where your media is located", required=True),
-    argument("-p", "--phone", help="The type of phone the media came from, which decides what gets discarded",
-             choices=supported_phone_types, default=default_phone_type),
+    argument("-p", "--phone", help="The type of phone the media came from, which decides what gets discarded. "
+                                   "Omit it to discard nothing",
+             choices=supported_phone_types),
 ])
 def sort(args):
     file_sort_class = sort_files.SortFiles(args.folder, args.phone)
