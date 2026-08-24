@@ -18,6 +18,7 @@ image_file_extensions:
   - ".gif"
   - ".jpeg"
   - ".heic"
+  - ".heif"
 video_file_extensions:
   - ".mp4"
   - ".mov"
@@ -25,6 +26,11 @@ video_file_extensions:
 audio_file_extensions:
   - ".mp3"
   - ".wav"
+  - ".m4a"
+discard_file_extensions:
+  android: []
+  iphone:
+    - ".aae"
 one_megabyte_in_bytes: 1000000
 android_source_paths:
   - "/sdcard/DCIM"

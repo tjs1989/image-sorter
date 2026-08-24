@@ -7,8 +7,9 @@ from config import setup
 
 
 class SortFiles:
-    def __init__(self, filepath):
+    def __init__(self, filepath, phone_type):
         self.filepath = filepath
+        self.phone_type = phone_type
         self.system_config = setup.get_system_config()
         self.file_operations = file_operations.FileOperations(filepath)
         self.folder_operations = folder_operations.FolderOperations(filepath)
@@ -18,6 +19,23 @@ class SortFiles:
             new_folder_filepath = f"{self.filepath}/{folder_name}"
             self.folder_operations.create_filepath(new_folder_filepath)
             logging.info(f"Created the folder {new_folder_filepath} if it does not already exist")
+
+    def discard_unwanted_files(self):
+        discard_extensions = self.system_config['discard_file_extensions'].get(self.phone_type, [])
+
+        if not discard_extensions:
+            return
+
+        files_to_discard = self.file_operations.get_list_of_files_in_path_by_type(
+            file_extension_types=discard_extensions,
+            exclude_top_level_dirs=self.system_config['initial_folder_structure'])
+
+        for file in files_to_discard:
+            self.file_operations.delete_file(file)
+            logging.info(f"Discarded {file} because its extension is in the {self.phone_type} discard list")
+
+        logging.info(f"Discarded {len(files_to_discard)} file(s) matching {discard_extensions} for phone type "
+                     f"{self.phone_type}")
 
     def process_files_in_file_list(self, list_of_files, file_type):
         for file in list_of_files:
@@ -39,6 +57,8 @@ class SortFiles:
             logging.info(f"Moved {file_name} to {new_file_folder_path}")
 
     def sort_files_into_folders(self):
+        self.discard_unwanted_files()
+
         self.create_initial_folder_structure()
 
         excluded = self.system_config['initial_folder_structure']
