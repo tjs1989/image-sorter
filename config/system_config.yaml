@@ -38,10 +38,8 @@ audio_file_extensions:
   - ".wav"
   - ".m4a"
 # Deleted outright by "sort -p <phone type>", at any size, before sorting starts.
-# Only for extensions that are junk *because of the phone they came from*, which is
-# why ".mp4" is here rather than in delete_below_size: the iPhone camera only records
-# ".mov", so an iPhone ".mp4" arrived from elsewhere, but an Android ".mp4" is a camera
-# original. It stays in video_file_extensions so every other phone still sorts it.
+# Only for junk specific to that phone: an iPhone ".mp4" came from elsewhere (its
+# camera only records ".mov"), while an Android ".mp4" is a camera original.
 discard_file_extensions:
   iphone:
     - ".aae"
