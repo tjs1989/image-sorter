@@ -45,8 +45,7 @@ discard_file_extensions:
     - ".aae"
     - ".mp4"
 # Deleted by the "delete" command, only when under size_in_bytes AND in this list.
-# Stills only. Size does not identify junk video: a 480p messaging clip outweighs a
-# short camera original, so messaging video is handled by discard_file_extensions.
+# Stills only: size does not identify junk video, so discard_file_extensions covers that.
 delete_below_size:
   size_in_bytes: 1000000
   file_extensions:
