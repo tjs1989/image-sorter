@@ -23,6 +23,13 @@ video_file_extensions:
   - ".mp4"
   - ".mov"
   - ".avi"
+  - ".m4v"
+  - ".mpeg"
+  - ".mpg"
+  - ".3gp"
+  - ".3g2"
+  - ".webm"
+  - ".mkv"
 audio_file_extensions:
   - ".mp3"
   - ".wav"
@@ -30,6 +37,7 @@ audio_file_extensions:
 discard_file_extensions:
   iphone:
     - ".aae"
+    - ".mp4"
 delete_below_size:
   size_in_bytes: 1000000
   file_extensions:
@@ -37,9 +45,6 @@ delete_below_size:
     - ".jpeg"
     - ".png"
     - ".gif"
-    - ".mp4"
-    - ".mpeg"
-    - ".mpg"
 android_source_paths:
   - "/sdcard/DCIM"
   - "/sdcard/Pictures"

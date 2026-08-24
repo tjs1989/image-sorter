@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from delete.delete_files import DeleteFiles
 
 
@@ -8,56 +10,27 @@ def _write(path, size_in_bytes):
     path.write_bytes(b"0" * size_in_bytes)
 
 
-def test_delete_removes_small_files_with_a_listed_extension(tmp_path):
-    _write(tmp_path / "whatsapp.jpg", 200_000)
-    _write(tmp_path / "sticker.gif", 50_000)
-    _write(tmp_path / "forwarded.mp4", 400_000)
+@pytest.mark.parametrize(
+    "filename,size_in_bytes,survives",
+    [
+        pytest.param("whatsapp.jpg", 200_000, False, id="small-jpg"),
+        pytest.param("sticker.gif", 50_000, False, id="small-gif"),
+        pytest.param("forwarded.mp4", 400_000, True, id="small-mp4-left-to-the-iphone-discard"),
+        pytest.param("SHOUTY.JPG", 100_000, False, id="uppercase-extension"),
+        pytest.param("MiXeD.JpEg", 100_000, False, id="mixed-case-extension"),
+        pytest.param("real_photo.jpg", 2_000_000, True, id="listed-but-over-threshold"),
+        pytest.param("IMG_1.heic", 800_000, True, id="small-heic-camera-original"),
+        pytest.param("IMG_2.mov", 300_000, True, id="small-mov-camera-original"),
+        pytest.param("voice_memo.m4a", 40_000, True, id="small-unlisted-audio"),
+        pytest.param("sticker.webp", 20_000, True, id="small-unlisted-image"),
+    ],
+)
+def test_delete_applies_the_size_and_extension_gates_together(tmp_path, filename, size_in_bytes, survives):
+    _write(tmp_path / filename, size_in_bytes)
 
     DeleteFiles(str(tmp_path)).delete_files_less_than_desired_size()
 
-    assert not (tmp_path / "whatsapp.jpg").exists()
-    assert not (tmp_path / "sticker.gif").exists()
-    assert not (tmp_path / "forwarded.mp4").exists()
-
-
-def test_delete_leaves_small_camera_originals_alone(tmp_path):
-    _write(tmp_path / "IMG_1.heic", 800_000)
-    _write(tmp_path / "IMG_2.mov", 300_000)
-    _write(tmp_path / "IMG_3.heif", 900_000)
-
-    DeleteFiles(str(tmp_path)).delete_files_less_than_desired_size()
-
-    assert (tmp_path / "IMG_1.heic").exists()
-    assert (tmp_path / "IMG_2.mov").exists()
-    assert (tmp_path / "IMG_3.heif").exists()
-
-
-def test_delete_leaves_large_files_alone_even_with_a_listed_extension(tmp_path):
-    _write(tmp_path / "real_photo.jpg", 2_000_000)
-
-    DeleteFiles(str(tmp_path)).delete_files_less_than_desired_size()
-
-    assert (tmp_path / "real_photo.jpg").exists()
-
-
-def test_delete_matches_extensions_case_insensitively(tmp_path):
-    _write(tmp_path / "SHOUTY.JPG", 100_000)
-    _write(tmp_path / "MiXeD.JpEg", 100_000)
-
-    DeleteFiles(str(tmp_path)).delete_files_less_than_desired_size()
-
-    assert not (tmp_path / "SHOUTY.JPG").exists()
-    assert not (tmp_path / "MiXeD.JpEg").exists()
-
-
-def test_delete_leaves_unlisted_extensions_alone(tmp_path):
-    _write(tmp_path / "voice_memo.m4a", 40_000)
-    _write(tmp_path / "sticker.webp", 20_000)
-
-    DeleteFiles(str(tmp_path)).delete_files_less_than_desired_size()
-
-    assert (tmp_path / "voice_memo.m4a").exists()
-    assert (tmp_path / "sticker.webp").exists()
+    assert (tmp_path / filename).exists() == survives
 
 
 def test_delete_recurses_into_a_sorted_tree(tmp_path):
