@@ -19,6 +19,9 @@ image_file_extensions:
   - ".jpeg"
   - ".heic"
   - ".heif"
+# What sort recognises and files into Videos/. Deliberately broader than anything
+# delete or discard targets: recognising a container costs nothing, failing to
+# recognise one leaves files behind in the source folder.
 video_file_extensions:
   - ".mp4"
   - ".mov"
@@ -34,10 +37,18 @@ audio_file_extensions:
   - ".mp3"
   - ".wav"
   - ".m4a"
+# Deleted outright by "sort -p <phone type>", at any size, before sorting starts.
+# Only for extensions that are junk *because of the phone they came from*, which is
+# why ".mp4" is here rather than in delete_below_size: the iPhone camera only records
+# ".mov", so an iPhone ".mp4" arrived from elsewhere, but an Android ".mp4" is a camera
+# original. It stays in video_file_extensions so every other phone still sorts it.
 discard_file_extensions:
   iphone:
     - ".aae"
     - ".mp4"
+# Deleted by the "delete" command, only when under size_in_bytes AND in this list.
+# Stills only. Size does not identify junk video: a 480p messaging clip outweighs a
+# short camera original, so messaging video is handled by discard_file_extensions.
 delete_below_size:
   size_in_bytes: 1000000
   file_extensions:
