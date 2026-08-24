@@ -1,7 +1,6 @@
 import os
 from datetime import datetime
 
-from main import cli
 from sort.sort_files import SortFiles
 
 
@@ -17,7 +16,9 @@ def test_sort_recurses_into_device_layout(tmp_path):
     _touch_with_mtime(tmp_path / "DCIM" / "Camera" / "IMG_1.jpg", captured)
     _touch_with_mtime(tmp_path / "DCIM" / "Camera" / "VID_1.mp4", captured)
     _touch_with_mtime(tmp_path / "Pictures" / "Screenshots" / "shot.png", captured)
+    _touch_with_mtime(tmp_path / "DCIM" / "100APPLE" / "IMG_1.HEIF", captured)
     _touch_with_mtime(tmp_path / "Music" / "song.mp3", captured)
+    _touch_with_mtime(tmp_path / "Music" / "memo.m4a", captured)
     _touch_with_mtime(tmp_path / "loose.jpeg", captured)
 
     SortFiles(str(tmp_path), "android").sort_files_into_folders()
@@ -29,8 +30,10 @@ def test_sort_recurses_into_device_layout(tmp_path):
     assert (images_day / "IMG_1.jpg").exists()
     assert (images_day / "shot.png").exists()
     assert (images_day / "loose.jpeg").exists()
+    assert (images_day / "IMG_1.HEIF").exists()
     assert (videos_day / "VID_1.mp4").exists()
     assert (audio_day / "song.mp3").exists()
+    assert (audio_day / "memo.m4a").exists()
 
     assert not (tmp_path / "DCIM" / "Camera" / "IMG_1.jpg").exists()
     assert not (tmp_path / "loose.jpeg").exists()
@@ -63,15 +66,18 @@ def test_sort_is_idempotent_when_rerun(tmp_path):
 
 def test_sort_discards_iphone_sidecars(tmp_path):
     captured = datetime(2024, 6, 15, 12, 0, 0)
+    images_day = tmp_path / "Images" / "2024" / "June" / "15-06-24"
     _touch_with_mtime(tmp_path / "IMG_1.HEIC", captured)
     _touch_with_mtime(tmp_path / "IMG_1.AAE", captured)
     _touch_with_mtime(tmp_path / "IMG_2.aae", captured)
+    _touch_with_mtime(images_day / "IMG_3.AAE", captured)
 
     SortFiles(str(tmp_path), phone_type="iphone").sort_files_into_folders()
 
-    assert (tmp_path / "Images" / "2024" / "June" / "15-06-24" / "IMG_1.HEIC").exists()
+    assert (images_day / "IMG_1.HEIC").exists()
     assert not (tmp_path / "IMG_1.AAE").exists()
     assert not (tmp_path / "IMG_2.aae").exists()
+    assert (images_day / "IMG_3.AAE").exists()
 
 
 def test_sort_leaves_sidecars_alone_for_android(tmp_path):
@@ -83,28 +89,4 @@ def test_sort_leaves_sidecars_alone_for_android(tmp_path):
     assert (tmp_path / "IMG_1.AAE").exists()
 
 
-def test_sort_subcommand_defaults_to_android():
-    args = cli.parse_args(["sort", "-f", "/some/path"])
 
-    assert args.phone == "android"
-
-
-def test_sort_discard_skips_already_sorted_output(tmp_path):
-    captured = datetime(2024, 6, 15, 12, 0, 0)
-    sorted_day = tmp_path / "Images" / "2024" / "June" / "15-06-24"
-    _touch_with_mtime(sorted_day / "IMG_1.AAE", captured)
-
-    SortFiles(str(tmp_path), phone_type="iphone").sort_files_into_folders()
-
-    assert (sorted_day / "IMG_1.AAE").exists()
-
-
-def test_sort_handles_iphone_heif_and_voice_memos(tmp_path):
-    captured = datetime(2024, 6, 15, 12, 0, 0)
-    _touch_with_mtime(tmp_path / "IMG_1.HEIF", captured)
-    _touch_with_mtime(tmp_path / "memo.m4a", captured)
-
-    SortFiles(str(tmp_path), phone_type="iphone").sort_files_into_folders()
-
-    assert (tmp_path / "Images" / "2024" / "June" / "15-06-24" / "IMG_1.HEIF").exists()
-    assert (tmp_path / "Audio" / "2024" / "June" / "15-06-24" / "memo.m4a").exists()

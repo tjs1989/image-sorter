@@ -11,11 +11,12 @@ class SortFiles:
         self.filepath = filepath
         self.phone_type = phone_type
         self.system_config = setup.get_system_config()
+        self.initial_folder_structure = self.system_config['initial_folder_structure']
         self.file_operations = file_operations.FileOperations(filepath)
         self.folder_operations = folder_operations.FolderOperations(filepath)
 
     def create_initial_folder_structure(self):
-        for folder_name in self.system_config['initial_folder_structure']:
+        for folder_name in self.initial_folder_structure:
             new_folder_filepath = f"{self.filepath}/{folder_name}"
             self.folder_operations.create_filepath(new_folder_filepath)
             logging.info(f"Created the folder {new_folder_filepath} if it does not already exist")
@@ -23,19 +24,13 @@ class SortFiles:
     def discard_unwanted_files(self):
         discard_extensions = self.system_config['discard_file_extensions'].get(self.phone_type, [])
 
-        if not discard_extensions:
-            return
-
         files_to_discard = self.file_operations.get_list_of_files_in_path_by_type(
             file_extension_types=discard_extensions,
-            exclude_top_level_dirs=self.system_config['initial_folder_structure'])
+            exclude_top_level_dirs=self.initial_folder_structure)
 
         for file in files_to_discard:
             self.file_operations.delete_file(file)
             logging.info(f"Discarded {file} because its extension is in the {self.phone_type} discard list")
-
-        logging.info(f"Discarded {len(files_to_discard)} file(s) matching {discard_extensions} for phone type "
-                     f"{self.phone_type}")
 
     def process_files_in_file_list(self, list_of_files, file_type):
         for file in list_of_files:
@@ -61,19 +56,17 @@ class SortFiles:
 
         self.create_initial_folder_structure()
 
-        excluded = self.system_config['initial_folder_structure']
-
         image_files_list = self.file_operations.get_list_of_files_in_path_by_type(
             file_extension_types=self.system_config['image_file_extensions'],
-            exclude_top_level_dirs=excluded)
+            exclude_top_level_dirs=self.initial_folder_structure)
 
         video_files_list = self.file_operations.get_list_of_files_in_path_by_type(
             file_extension_types=self.system_config['video_file_extensions'],
-            exclude_top_level_dirs=excluded)
+            exclude_top_level_dirs=self.initial_folder_structure)
 
         audio_files_list = self.file_operations.get_list_of_files_in_path_by_type(
             file_extension_types=self.system_config['audio_file_extensions'],
-            exclude_top_level_dirs=excluded)
+            exclude_top_level_dirs=self.initial_folder_structure)
 
         self.process_files_in_file_list(image_files_list, "Images")
         self.process_files_in_file_list(video_files_list, "Videos")
