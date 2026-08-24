@@ -30,7 +30,16 @@ audio_file_extensions:
 discard_file_extensions:
   iphone:
     - ".aae"
-one_megabyte_in_bytes: 1000000
+delete_below_size:
+  size_in_bytes: 1000000
+  file_extensions:
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".gif"
+    - ".mp4"
+    - ".mpeg"
+    - ".mpg"
 android_source_paths:
   - "/sdcard/DCIM"
   - "/sdcard/Pictures"
