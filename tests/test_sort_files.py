@@ -80,6 +80,23 @@ def test_sort_discards_iphone_sidecars(tmp_path):
     assert (images_day / "IMG_3.AAE").exists()
 
 
+def test_sort_discards_iphone_mp4_regardless_of_size(tmp_path):
+    captured = datetime(2024, 6, 15, 12, 0, 0)
+    videos_day = tmp_path / "Videos" / "2024" / "June" / "15-06-24"
+    _touch_with_mtime(tmp_path / "whatsapp.mp4", captured)
+    _touch_with_mtime(tmp_path / "BIG.MP4", captured)
+    (tmp_path / "BIG.MP4").write_bytes(b"0" * 20_000_000)
+    _touch_with_mtime(tmp_path / "IMG_1.MOV", captured)
+    _touch_with_mtime(videos_day / "already_sorted.mp4", captured)
+
+    SortFiles(str(tmp_path), phone_type="iphone").sort_files_into_folders()
+
+    assert not (tmp_path / "whatsapp.mp4").exists()
+    assert not (tmp_path / "BIG.MP4").exists()
+    assert (videos_day / "IMG_1.MOV").exists()
+    assert (videos_day / "already_sorted.mp4").exists()
+
+
 def test_sort_leaves_sidecars_alone_without_a_phone_type(tmp_path):
     captured = datetime(2024, 6, 15, 12, 0, 0)
     _touch_with_mtime(tmp_path / "IMG_1.AAE", captured)
