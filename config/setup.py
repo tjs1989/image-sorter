@@ -1,3 +1,4 @@
+import functools
 import os
 
 from utils.load_files import get_yaml_keys
@@ -5,6 +6,7 @@ from utils.load_files import get_yaml_keys
 script_dir = os.path.dirname(__file__)
 project_root = os.path.dirname(script_dir)
 
+@functools.lru_cache(maxsize=1)
 def get_system_config():
     system_config_filepath = os.path.join(script_dir, "system_config.yaml")
     return get_yaml_keys(system_config_filepath)

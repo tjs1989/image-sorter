@@ -54,9 +54,14 @@ def subcommand(args=None, parent=subparsers):
     return decorator
 
 
-@subcommand([argument("-f", "--folder", help="The full path to the folder where your media is located", required=True)])
+@subcommand([
+    argument("-f", "--folder", help="The full path to the folder where your media is located", required=True),
+    argument("-p", "--phone", help="The type of phone the media came from, which decides what gets discarded. "
+                                   "Omit it to discard nothing",
+             choices=sorted(get_system_config()['discard_file_extensions'])),
+])
 def sort(args):
-    file_sort_class = sort_files.SortFiles(args.folder)
+    file_sort_class = sort_files.SortFiles(args.folder, args.phone)
     file_sort_class.sort_files_into_folders()
 
 
