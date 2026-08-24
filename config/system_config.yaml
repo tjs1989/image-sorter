@@ -28,7 +28,6 @@ audio_file_extensions:
   - ".wav"
   - ".m4a"
 discard_file_extensions:
-  android: []
   iphone:
     - ".aae"
 one_megabyte_in_bytes: 1000000
