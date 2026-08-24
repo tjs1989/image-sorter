@@ -33,3 +33,10 @@ android_source_paths:
   - "/sdcard/Music"
 android_purge_only_paths:
   - "/sdcard/Android/media/com.whatsapp/WhatsApp/Media"
+google_drive:
+  # Paths are relative to the repo root (or absolute). Both files are gitignored.
+  client_secrets_path: "client_secrets.json"
+  token_path: "drive_token.json"
+  # Full drive scope is required to reuse folders you created in the Drive web UI.
+  # Narrow to ".../auth/drive.file" only if you let the app own an isolated folder.
+  scope: "https://www.googleapis.com/auth/drive"

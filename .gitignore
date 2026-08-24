@@ -4,3 +4,5 @@ debug.log
 .python-version
 __pycache__/
 .pytest_cache/
+client_secrets.json
+drive_token.json
